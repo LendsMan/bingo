@@ -14,7 +14,6 @@ const BINGO_TEXTS = [
   'Something for Minecraft', 
   'Next Gen tease', 
   'CRINGE', 
-  'XBOX CONFERENCE',
   'WORLD REVEAL', 
   'Battletoads gameplay', 
   'Banjo Kazzooie remake', 
@@ -29,9 +28,11 @@ const BINGO_TEXTS = [
   'New controller',
 ];
 
+const BINGO_CENTER_TILE = 'XBOX CONFERENCE';
+
 function App() {
   return (
-    <Bingo texts={BINGO_TEXTS}></Bingo>
+    <Bingo tiles={BINGO_TEXTS} centerTile={BINGO_CENTER_TILE}></Bingo>
   );
 }
 

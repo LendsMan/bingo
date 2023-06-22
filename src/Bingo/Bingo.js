@@ -1,21 +1,25 @@
 import { useEffect, useState } from 'react';
 import { BingoTile, Wrapper } from './styled';
+import { shuffle } from '../helpers/shuffle.helper';
+
 
 const BINGO_SIZE = 5;
-const BINGO_PLACE = Math.floor(BINGO_SIZE * BINGO_SIZE / 2);
-const DEFAULT_SELECTED_STATE = Array.from({length: BINGO_SIZE * BINGO_SIZE}, (i, index) => index === BINGO_PLACE);
+const BINGO_INDEX = Math.floor(BINGO_SIZE * BINGO_SIZE / 2);
+const DEFAULT_SELECTED_STATE = Array.from({length: BINGO_SIZE * BINGO_SIZE}, (i, index) => index === BINGO_INDEX);
 
-const LEFT_DIAGONAL =  getLeftDiagonal();
-const RIGHT_DIAGONAL= getRightDiagonal();
+const LEFT_DIAGONAL = getLeftDiagonal();
+const RIGHT_DIAGONAL = getRightDiagonal();
 
-function Bingo({ texts }) {
+function Bingo({ tiles, centerTile }) {
   const [selectedTiles, setSelectedTiles] = useState(DEFAULT_SELECTED_STATE);
   const [completed, setCompleted] = useState(new Set());
+  const [bingoTiles, setBingoTiles] = useState([]);
 
   useEffect(() => {
+    setBingoTiles(getBingoTiles(tiles, centerTile, BINGO_INDEX));
     setCompleted(new Set());
     setSelectedTiles(DEFAULT_SELECTED_STATE);
-  }, [texts]);
+  }, [tiles, centerTile]);
 
   const checkGame = (tiles, index) => {
     if (!tiles[index]) {
@@ -66,7 +70,7 @@ function Bingo({ texts }) {
   };
 
   const toggle = (index) => {
-    if (index === BINGO_PLACE) {
+    if (index === BINGO_INDEX) {
       return;
     }
 
@@ -78,18 +82,17 @@ function Bingo({ texts }) {
     checkGame(tiles, index);
   };
 
-  const bingoTiles = texts.map((text, index) =>
-    <BingoTile key={index} 
-               $selected={index === BINGO_PLACE ? true : selectedTiles[index]} 
-               $completed={completed.has(index)} 
-               $center={index === BINGO_PLACE}
-               onClick={() => toggle(index)}
-    >{ text }</BingoTile>
-  );
-
   return (
     <Wrapper className="Bingo">
-      { bingoTiles }
+      {   
+        bingoTiles.map((text, index) =>
+          <BingoTile key={index} 
+                    $selected={index === BINGO_INDEX ? true : selectedTiles[index]} 
+                    $completed={completed.has(index)} 
+                    $center={index === BINGO_INDEX}
+                    onClick={() => toggle(index)}
+          >{ text }</BingoTile>)
+      }
     </Wrapper>
   );
 }
@@ -160,4 +163,14 @@ function showWinningAnimation() {
     jsConfetti.addConfetti({
       emojis: ['✨'],
     });
+}
+
+function getBingoTiles(tiles, centerTile, centerTileIndex) {
+  const tempTiles = shuffle(tiles);
+
+  return [
+    ...tempTiles.slice(0, centerTileIndex),
+    centerTile,
+    ...tempTiles.slice(centerTileIndex),
+  ];
 }
